@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 namespace FolderManager.Services
 {
@@ -17,7 +18,7 @@ namespace FolderManager.Services
         {
             if (Directory.Exists(folderPath))
             {
-                return Directory.GetFiles(folderPath);
+                return Directory.GetFiles(folderPath).Select(x => Path.GetFileName(x));
             }
 
             throw new DirectoryNotFoundException($"{folderPath} does not exists!");

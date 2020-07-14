@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FolderManager.Data\FolderManager.Data.csproj" />
     <ProjectReference Include="..\FolderManager.Services\FolderManager.Services.csproj" />
   </ItemGroup>
 

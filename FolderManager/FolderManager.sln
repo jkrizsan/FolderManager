@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager", "FolderMana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager.Api", "FolderManager.Api\FolderManager.Api.csproj", "{E209B250-B2E6-4451-9E67-1F5105B05438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderManager.Services", "FolderManager.Services\FolderManager.Services.csproj", "{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager.Services", "FolderManager.Services\FolderManager.Services.csproj", "{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderManager.Data", "FolderManager.Data\FolderManager.Data.csproj", "{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

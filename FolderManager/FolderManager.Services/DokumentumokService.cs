@@ -1,17 +1,22 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FolderManager.Services
 {
 
     public class DokumentumokService : IDokumentumokService
     {
-        public DokumentumokService()
-        {
+        public IConfiguration Configuration { get; }
 
+        public DokumentumokService(IConfiguration Configuration)
+        {
+            this.Configuration = Configuration;
         }
 
         public IEnumerable<string> GetAllFileNameFromFolder(string folderPath)
@@ -23,5 +28,27 @@ namespace FolderManager.Services
 
             throw new DirectoryNotFoundException($"{folderPath} does not exists!");
         }
+
+        public async Task<string> SaveFileFromPost(IFormFile file)
+        {
+            try
+            {
+                var filePath = Path.Combine(GetFolderPath(), file.FileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                return "";
+            }
+            catch(Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+
+        private string GetFolderPath()
+            => Configuration.GetSection("FolderConfig").GetSection("Path").Value;
+
     }
 }

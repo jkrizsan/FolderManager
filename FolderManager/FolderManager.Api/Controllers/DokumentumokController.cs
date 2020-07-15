@@ -20,11 +20,6 @@ namespace FolderManager.Api.Controllers
     [Route("api/[controller]")]
     public class DokumentumokController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly IDokumentumokService dokumentumokService;
         public IConfiguration Configuration { get; }
 
@@ -32,72 +27,24 @@ namespace FolderManager.Api.Controllers
         private string GetFolderPath()
             => Configuration.GetSection("FolderConfig").GetSection("Path").Value;
 
-        public DokumentumokController(ILogger<DokumentumokController> logger, IDokumentumokService dokumentumokService,
-            IConfiguration Configuration)
+        public DokumentumokController(IDokumentumokService dokumentumokService, IConfiguration Configuration)
         {
             this.dokumentumokService = dokumentumokService;
             this.Configuration = Configuration;
         }
 
-        //[HttpGet("{fileName}")]
-        //public string Get(string fileName)
-        //{
-        //    var filePath = Path.Combine(GetFolderPath(), fileName); //@$"{GetFolderPath()}\\{fileName}";
-        //    byte[] b = System.IO.File.ReadAllBytes(filePath);
-        //    return "data:image/png;base64," + Convert.ToBase64String(b);
-        //}
-
-
-        //[HttpGet("{fileName}")]
-        //public HttpResponseMessage Get(string fileName)
-        //{
-
-        //    var filePath = Path.Combine(GetFolderPath(), fileName);
-        //    var dataBytes = System.IO.File.ReadAllBytes(filePath);
-        //    //adding bytes to memory stream   
-        //    var dataStream = new MemoryStream(dataBytes);
-
-        //    HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-        //    httpResponseMessage.Content = new StreamContent(dataStream);
-        //    httpResponseMessage.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
-        //    httpResponseMessage.Content.Headers.ContentDisposition.FileName = filePath;
-        //    httpResponseMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("Base64");
-
-        //    return httpResponseMessage;
-        //}
-
         [HttpPost]
         public async Task<IActionResult> Post(IFormFile file)
         {
-            var stream = file.OpenReadStream();
-            var name = file.FileName;
-            var filePath = Path.Combine(GetFolderPath(), file.FileName);
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            var resPonse = await dokumentumokService.SaveFileFromPost(file);
+
+            if (resPonse.Equals(string.Empty))
             {
-                await file.CopyToAsync(fileStream);
+                return Content("Ok");
             }
-            return null; //null just to make error free
+
+            return Content(resPonse);
         }
-
-        //[HttpPost]
-        //public FileContentResult Post([FromBody] UploadFileDto model)
-        //{
-        //    //Depending on if you want the byte array or a memory stream, you can use the below. 
-        //    var imageDataByteArray = Convert.FromBase64String(model.FileData);
-
-        //    //When creating a stream, you need to reset the position, without it you will see that you always write files with a 0 byte length. 
-        //    var imageDataStream = new MemoryStream(imageDataByteArray);
-        //    imageDataStream.Position = 0;
-
-        //    //Go and do something with the actual data.
-        //    //_customerImageService.Upload([...])
-
-        //    //For the purpose of the demo, we return a file so we can ensure it was uploaded correctly. 
-        //    //But otherwise you can just return a 204 etc. 
-        //    return File(imageDataByteArray, "txt");
-        //}
-
-
 
         [HttpGet("{fileName}")]
         public async Task<IActionResult> Get(string filename)
@@ -147,7 +94,7 @@ namespace FolderManager.Api.Controllers
         public string GetAll()
         {
             FileListDto response = new FileListDto();
-            //IEnumerable<string> response = null;
+
             try
             {
                 response.Files = dokumentumokService.GetAllFileNameFromFolder(GetFolderPath());

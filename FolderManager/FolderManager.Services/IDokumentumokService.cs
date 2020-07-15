@@ -13,5 +13,12 @@ namespace FolderManager.Services
         IEnumerable<string> GetAllFileNameFromFolder(string folderPath);
 
         Task<string> SaveFileFromPost(IFormFile file);
+
+        Task<MemoryStream> GetFileInMemoryStream(string path);
+
+        string GetContentType(string path);
+
+        string GetFolderPath();
+
     }
 }

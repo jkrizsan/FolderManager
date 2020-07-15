@@ -15,10 +15,15 @@ namespace FolderManager
 {
     partial class Form1
     {
-        private OpenFileDialog openFileDialog1 = new OpenFileDialog();
+        private string baseUrl = "https://localhost:44307/api/";
+        private string fileServiceName = "dokumentumok";
+
+        private OpenFileDialog openFileDialog = new OpenFileDialog();
         private List<string> fileList;
 
         private HttpClient client = new HttpClient();
+
+        private View view = new View();
 
         /// <summary>
         ///  Required designer variable.
@@ -42,14 +47,14 @@ namespace FolderManager
         {
             try
             {
-                var response = await client.GetAsync("https://localhost:44307/api/dokumentumok");
+                var response = await client.GetAsync($"{baseUrl}{fileServiceName}");
                 string apiResponse =  await response.Content.ReadAsStringAsync();
                 var res  = JsonConvert.DeserializeObject<FileListDto>(apiResponse);
                 fileList = res.Files.ToList();
             }
             catch(Exception ex)
             {
-                Console.WriteLine();
+                MessageBox.Show($"Error happened, error message: {ex.Message}");
             }
         }
 
@@ -57,7 +62,12 @@ namespace FolderManager
         {
             var curButton = (Button)sender;
             var curFileName = curButton.Name;
-            var response =  await client.GetAsync($"https://localhost:44307/api/dokumentumok/{curFileName}");
+            var response =  await client.GetAsync($"{baseUrl}{fileServiceName}/{curFileName}");
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Error happened during downloading {curFileName} file");
+                return;
+            }
             using (var stream =  response.Content.ReadAsStreamAsync())
             {
                 var fileInfo = new FileInfo(curFileName);
@@ -70,15 +80,13 @@ namespace FolderManager
 
         private async Task UploadClick(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    //var sr = new StreamReader(openFileDialog1.FileName);
-
                     using (var form = new MultipartFormDataContent())
                     {
-                        using (var fs = File.OpenRead(openFileDialog1.FileName))
+                        using (var fs = File.OpenRead(openFileDialog.FileName))
                         {
                             using (var streamContent = new StreamContent(fs))
                             {
@@ -86,12 +94,19 @@ namespace FolderManager
                                 {
                                     fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
 
-                                    form.Add(fileContent, "file", Path.GetFileName(openFileDialog1.FileName));
-                                    HttpResponseMessage response = await client.PostAsync("https://localhost:44307/api/dokumentumok", form);
+                                    form.Add(fileContent, "file", Path.GetFileName(openFileDialog.FileName));
+                                    HttpResponseMessage response =
+                                        await client.PostAsync($"{baseUrl}{fileServiceName}", form);
+                                    if (!response.IsSuccessStatusCode)
+                                    {
+                                        MessageBox.Show($"Error happened during uploading {openFileDialog.FileName} file");
+                                    }
                                 }
                             }
                         }
                     }
+
+                    await InitializeGrid();
                 }
                 catch (SecurityException ex)
                 {
@@ -109,51 +124,52 @@ namespace FolderManager
         /// </summary>
         private async void InitializeComponent()
         {
-            client.BaseAddress = new Uri("http://localhost:44307/");
-            await DownloadFileNames();
+            view.InitPanel1();
 
-            var panel1 = new TableLayoutPanel();
-            panel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-            panel1.RowCount = 2;
-            panel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20));
-            panel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            panel1.AutoSize = true;
-            panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            view.InitGroupBox();
 
-            var groupBox1 = new GroupBox() { Text = "GroupBox" };
-            groupBox1.AutoSize = true;
-            groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            view.InitPanel2();
 
-            var panel2 = new TableLayoutPanel() { Top = 24, Left = 5 };
-            panel2.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-            panel2.AutoSize = true;
-            panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            view.groupBox.Controls.Add(view.panel2);
 
-            groupBox1.Controls.Add(panel2);
-
-            panel1.Controls.Add(new Label() { Text = "Label" });
-            panel1.Controls.Add(groupBox1);
-            var uploadButton = new Button() { Text = "Add new file" };
+            view.panel1.Controls.Add(new Label() { Text = "Files" });
+            view.panel1.Controls.Add(view.groupBox);
+            view.panel1.AutoSize = true;
+            view.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            view.panel1.Size = new System.Drawing.Size(100,100);
+            var uploadButton = new Button() { Text = "Add new file", AutoSize = true };
             uploadButton.Click += new EventHandler(async (s, e) => await UploadClick(s, e));
-            panel1.Controls.Add(uploadButton);
+            view.panel1.Controls.Add(uploadButton);
             this.SuspendLayout();
-            this.Controls.Add(panel1);
+            this.Controls.Add(view.panel1);
             this.AutoScroll = true;
+
+            await InitializeGrid();
+
+            this.ResumeLayout(true);
+        }
+
+        private async Task InitializeGrid()
+        {
+            await DownloadFileNames();
+            view.panel2.Controls.Clear();  
+
             for (int i = 0; i < fileList.Count; i++)
             {
-                panel2.RowCount += 1;
-                panel2.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                view.panel2.RowCount += 1;
+                view.panel2.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-                panel2.Controls.Add(new GroupBox()
-                {
-                    Text = string.Format($"{fileList[i]}")
-                });
-                var button = new Button() { Text = "Download File", Name = fileList[i] };
+                var label = new Label() { Text = string.Format($"{fileList[i]}") };
+
+                var button = new Button() { Text = "Download File", Name = fileList[i], AutoSize = true };
                 button.Click += new EventHandler(async (s, e) => await DownloadClick(s, e));
-                panel2.Controls.Add(button);
-            }
-            this.ResumeLayout(true);
 
+                view.panel2.Controls.Add(label);
+
+                view.panel2.Controls.Add(button);
+                view.panel2.SetRow(label, view.panel2.RowCount); view.panel2.SetColumn(label, 0);
+                view.panel2.SetRow(button, view.panel2.RowCount); view.panel2.SetColumn(button, 1);
+            }
         }
 
         #endregion

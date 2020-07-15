@@ -21,16 +21,10 @@ namespace FolderManager.Api.Controllers
     public class DokumentumokController : ControllerBase
     {
         private readonly IDokumentumokService dokumentumokService;
-        public IConfiguration Configuration { get; }
 
-
-        private string GetFolderPath()
-            => Configuration.GetSection("FolderConfig").GetSection("Path").Value;
-
-        public DokumentumokController(IDokumentumokService dokumentumokService, IConfiguration Configuration)
+        public DokumentumokController(IDokumentumokService dokumentumokService)
         {
             this.dokumentumokService = dokumentumokService;
-            this.Configuration = Configuration;
         }
 
         [HttpPost]
@@ -47,48 +41,25 @@ namespace FolderManager.Api.Controllers
         }
 
         [HttpGet("{fileName}")]
-        public async Task<IActionResult> Get(string filename)
+        public async Task<IActionResult> Get(string fileName)
         {
-            if (filename == null)
+            if (fileName == null)
+            {
                 return Content("filename not present");
+            }
 
             var path = Path.Combine(
                            Directory.GetCurrentDirectory(),
-                           GetFolderPath(), filename);
+                           dokumentumokService.GetFolderPath(), fileName);
 
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-            memory.Position = 0;
-            return File(memory, GetContentType(path), Path.GetFileName(path));
+            var memory = await dokumentumokService.GetFileInMemoryStream(path);
+
+            var contentType =  dokumentumokService.GetContentType(path);
+
+            return File(memory, contentType, Path.GetFileName(path));
         }
 
-        private string GetContentType(string path)
-        {
-            var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
-            return types[ext];
-        }
-
-        private Dictionary<string, string> GetMimeTypes()
-        {
-            return new Dictionary<string, string>
-            {
-                {".txt", "text/plain"},
-                {".pdf", "application/pdf"},
-                {".doc", "application/vnd.ms-word"},
-                {".docx", "application/vnd.ms-word"},
-                {".xls", "application/vnd.ms-excel"},
-                {".xlsx", "application/vnd.openxmlformats  officedocument.spreadsheetml.sheet"},  
-                {".png", "image/png"},
-                {".jpg", "image/jpeg"},
-                {".jpeg", "image/jpeg"},
-                {".gif", "image/gif"},
-                {".csv", "text/csv"}
-            };
-        }
+        
 
             [HttpGet]
         public string GetAll()
@@ -97,7 +68,7 @@ namespace FolderManager.Api.Controllers
 
             try
             {
-                response.Files = dokumentumokService.GetAllFileNameFromFolder(GetFolderPath());
+                response.Files = dokumentumokService.GetAllFileNameFromFolder(dokumentumokService.GetFolderPath());
             }
             catch (DirectoryNotFoundException aEx)
             {

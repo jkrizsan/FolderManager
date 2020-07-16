@@ -32,7 +32,7 @@ namespace FolderManager
         {
             panel2.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
             panel2.AutoSize = true;
-            panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            panel2.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         }
 
         public void InitGroupBox()

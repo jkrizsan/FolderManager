@@ -146,7 +146,11 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\AI\\FolderManager\\FolderManager\\FolderManager\\FolderManager.Data\\FolderManager.Data.csproj": {
+                "projectPath": "D:\\AI\\FolderManager\\FolderManager\\FolderManager\\FolderManager.Data\\FolderManager.Data.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

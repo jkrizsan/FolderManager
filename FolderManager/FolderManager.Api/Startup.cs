@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FolderManager.Services;
+using FolderManager.Services.Handlers;
+using FolderManager.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,7 +30,7 @@ namespace FolderManager.Api
         {
             services.AddControllers();
             services.AddScoped<IDokumentumokService, DokumentumokService>();
-
+            services.AddScoped<IHttpHandler, HttpHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

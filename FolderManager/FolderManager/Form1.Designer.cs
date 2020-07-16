@@ -1,13 +1,7 @@
-﻿using FolderManager.Data.DTOs;
-using Newtonsoft.Json;
+﻿using FolderManager.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,14 +9,13 @@ namespace FolderManager
 {
     partial class Form1
     {
-        private string baseUrl = "https://localhost:44307/api/";
-        private string fileServiceName = "dokumentumok";
+        
 
         private OpenFileDialog openFileDialog = new OpenFileDialog();
-        private List<string> fileList;
+        private List<string> fileList = new List<string>();
 
         private HttpClient client = new HttpClient();
-
+        private readonly IDownloadService downloadService;
         private View view = new View();
 
         /// <summary>
@@ -45,16 +38,10 @@ namespace FolderManager
 
         private async Task DownloadFileNames()
         {
-            try
+            fileList = await downloadService.DownloadFileNames();
+            if (fileList == null)
             {
-                var response = await client.GetAsync($"{baseUrl}{fileServiceName}");
-                string apiResponse =  await response.Content.ReadAsStringAsync();
-                var res  = JsonConvert.DeserializeObject<FileListDto>(apiResponse);
-                fileList = res.Files.ToList();
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show($"Error happened, error message: {ex.Message}");
+                MessageBox.Show($"Error happened during download the file names");
             }
         }
 
@@ -62,19 +49,10 @@ namespace FolderManager
         {
             var curButton = (Button)sender;
             var curFileName = curButton.Name;
-            var response =  await client.GetAsync($"{baseUrl}{fileServiceName}/{curFileName}");
-            if (!response.IsSuccessStatusCode)
+            var ret = await downloadService.Download(curFileName);
+            if (!ret)
             {
                 MessageBox.Show($"Error happened during downloading {curFileName} file");
-                return;
-            }
-            using (var stream =  response.Content.ReadAsStreamAsync())
-            {
-                var fileInfo = new FileInfo(curFileName);
-                using (var fileStream = fileInfo.Create())
-                {
-                    await stream.Result.CopyToAsync(fileStream);
-                }
             }
         }
 
@@ -82,46 +60,13 @@ namespace FolderManager
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                try
-                {
-                    using (var form = new MultipartFormDataContent())
-                    {
-                        using (var fs = File.OpenRead(openFileDialog.FileName))
-                        {
-                            using (var streamContent = new StreamContent(fs))
-                            {
-                                using (var fileContent = new ByteArrayContent(await streamContent.ReadAsByteArrayAsync()))
-                                {
-                                    fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
-
-                                    form.Add(fileContent, "file", Path.GetFileName(openFileDialog.FileName));
-                                    HttpResponseMessage response =
-                                        await client.PostAsync($"{baseUrl}{fileServiceName}", form);
-                                    if (!response.IsSuccessStatusCode)
-                                    {
-                                        MessageBox.Show($"Error happened during uploading {openFileDialog.FileName} file");
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    await InitializeGrid();
-                }
-                catch (SecurityException ex)
-                {
-                    MessageBox.Show($"Security error.\n\nError message: {ex.Message}\n\n" +
-                    $"Details:\n\n{ex.StackTrace}");
-                }
+                await downloadService.Upload(openFileDialog.FileName);
             }
+            await InitializeGrid();
         }
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
         private async void InitializeComponent()
         {
             view.InitPanel1();

@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FolderManager.Services
+namespace FolderManager.Services.Interfaces
 {
     public interface IDokumentumokService
     {

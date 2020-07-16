@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FolderManager.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,8 +13,9 @@ namespace FolderManager
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        public Form1(IDownloadService downloadService)
         {
+            this.downloadService = downloadService;
             InitializeComponent();
         }
 

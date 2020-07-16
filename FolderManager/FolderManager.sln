@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager.Api", "Folder
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager.Services", "FolderManager.Services\FolderManager.Services.csproj", "{7C187903-ADD4-4EE2-B4D5-B759A8FCB2D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderManager.Data", "FolderManager.Data\FolderManager.Data.csproj", "{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderManager.Data", "FolderManager.Data\FolderManager.Data.csproj", "{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderManager.Tests", "FolderManager.Tests\FolderManager.Tests.csproj", "{7E523BA4-CE90-4A6E-821F-D9C733D12446}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DDF7061-F2F2-494E-9A69-FDDE8B3903CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E523BA4-CE90-4A6E-821F-D9C733D12446}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E523BA4-CE90-4A6E-821F-D9C733D12446}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E523BA4-CE90-4A6E-821F-D9C733D12446}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E523BA4-CE90-4A6E-821F-D9C733D12446}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -50,10 +50,6 @@ namespace FolderManager.Api
             app.UseEndpoints(endpoints =>
             {
                endpoints.MapControllers();
-
-                //endpoints.MapControllerRoute(
-                //    name: "dokumentumok",
-                //    pattern: "{controller=Folder}/{action=Get}");
             });
         }
     }
